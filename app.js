@@ -7,6 +7,7 @@ const NotFoundError = require('./errors/NotFoundError');
 const handleError = require('./errors/handleError');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -15,6 +16,8 @@ mongoose.connect(URL_MONGO, SETUP_MONGO);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -39,6 +42,8 @@ app.use('/movies', require('./routes/movies'));
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Указанный адрес не существует'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
