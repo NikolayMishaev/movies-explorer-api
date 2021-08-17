@@ -13,6 +13,9 @@ mongoose.connect(URL_MONGO, SETUP_MONGO);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/users', require('./routes/users'));
+app.use('/movies', require('./routes/movies'));
+
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Указанный адрес не существует'));
 });
