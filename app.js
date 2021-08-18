@@ -13,7 +13,7 @@ const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const limiter = require('./middlewares/limiter');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3003 } = process.env;
 const app = express();
 mongoose.connect(URL_MONGO, SETUP_MONGO);
 
