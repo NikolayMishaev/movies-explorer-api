@@ -5,7 +5,7 @@ const {
   getAllMovies,
   createMovie,
   deleteMovie,
-} = require('../controllers/users');
+} = require('../controllers/movies');
 const BadRequestError = require('../errors/BadRequestError');
 
 const method = (value) => {
