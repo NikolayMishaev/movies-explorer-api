@@ -5,6 +5,7 @@ const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const { userError, authorizationError } = require('../errors/messages');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -12,12 +13,12 @@ const getDataUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      throw new NotFoundError('Пользователь по указанному id не найден');
+      throw new NotFoundError(userError.userIdNotFound);
     }
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      next(new BadRequestError('Указан не валидный номер id пользователя'));
+      next(new BadRequestError(userError.userIdBadRequest));
     }
     next(err);
   }
@@ -32,12 +33,11 @@ const updateDataUser = async (req, res, next) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
       },
     ));
   } catch (err) {
     if (err.name === 'CastError') {
-      next(new NotFoundError('Пользователь с указанным id не найден'));
+      next(new NotFoundError(userError.userIdNotFound));
     }
     next(err);
   }
@@ -48,11 +48,11 @@ const login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      throw new UnauthorizedError('Неправильные почта или пароль');
+      throw new UnauthorizedError(authorizationError.userUnauthorized);
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
-      throw new UnauthorizedError('Неправильные почта или пароль');
+      throw new UnauthorizedError(authorizationError.userUnauthorized);
     }
     const token = jwt.sign(
       { _id: user._id },
@@ -80,16 +80,11 @@ const createUser = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(
-        new BadRequestError(
-          `Переданы некорректные данные при создании пользователя. В поле ${err.message.replace(
-            'user validation failed: ',
-            '',
-          )}`,
-        ),
+        new BadRequestError(userError.userCreateBadRequest),
       );
     }
     if (err.name === 'MongoError' && err.code === 11000) {
-      next(new ConflictError('Пользователь с таким email уже зарегистрирован'));
+      next(new ConflictError(userError.userEmailConflict));
     }
     next(err);
   }

@@ -2,6 +2,8 @@ const Movie = require('../models/movie');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
+const { movieError } = require('../errors/messages');
+const { messages } = require('../utils/constants');
 
 const getAllMovies = async (req, res, next) => {
   try {
@@ -34,8 +36,7 @@ const createMovie = async (req, res, next) => {
     }));
   } catch (err) {
     if (err.name === 'ValidationError') {
-      next(new BadRequestError(`Переданы некорректные данные при создании фильма.
-      В поле ${err.message.replace('card validation failed: ', '')}`));
+      next(new BadRequestError(movieError.movieCreateBadRequest));
     }
     next(err);
   }
@@ -46,13 +47,13 @@ const deleteMovie = async (req, res, next) => {
     const owner = req.user._id;
     const movie = await Movie.findById(req.params.id);
     if (!movie) {
-      throw new NotFoundError('Фильм с указанным id не найден');
+      throw new NotFoundError(movieError.movieIdNotFound);
     }
     if (owner === movie.owner.toString()) {
       await Movie.findByIdAndRemove(req.params.id);
-      res.send({ message: 'фильм удален' });
+      res.send({ message: messages.movieDeleted });
     }
-    throw new ForbiddenError('Вы не можете удалять фильмы других пользователей');
+    throw new ForbiddenError(movieError.movieDeleteForbidden);
   } catch (err) {
     next(err);
   }

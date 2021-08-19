@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { validityError } = require('../errors/messages');
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -27,7 +28,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       // eslint-disable-next-line no-useless-escape
       validator: (v) => /^https?:\/\/(www\.)?[a-z0-9-._~:\/?#[\]@!$&'()*+,;=]*#?/i.test(v),
-      message: 'Указан невалидный формат ссылки',
+      message: validityError.urlBadRequest,
     },
   },
   trailer: {
@@ -36,7 +37,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       // eslint-disable-next-line no-useless-escape
       validator: (v) => /^https?:\/\/(www\.)?[a-z0-9-._~:\/?#[\]@!$&'()*+,;=]*#?/i.test(v),
-      message: 'Указан невалидный формат ссылки',
+      message: validityError.urlBadRequest,
     },
   },
   thumbnail: {
@@ -45,7 +46,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       // eslint-disable-next-line no-useless-escape
       validator: (v) => /^https?:\/\/(www\.)?[a-z0-9-._~:\/?#[\]@!$&'()*+,;=]*#?/i.test(v),
-      message: 'Указан невалидный формат ссылки',
+      message: validityError.urlBadRequest,
     },
   },
   owner: {
